@@ -48,7 +48,14 @@ namespace SFHttpServer
             HttpListenerRequest request = context.Request;
             Task.Run(async() =>
             {
-                await Process(context, request);
+                try
+                {
+                    await Process(context, request);
+                }
+                catch(Exception e)
+                {
+                    Console.Error.WriteLine(e);
+                }
             });
             ReceiveMessage();
         }
