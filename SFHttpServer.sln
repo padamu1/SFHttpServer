@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34018.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFHttpServer", "SFHttpServer\SFHttpServer.csproj", "{44A00E08-D69F-4A1E-B817-5AF67A2EE54D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFCSharpServerLib", "SFCSharpServerLib\SFCSharpServerLib.csproj", "{5CF99AC2-4F02-4FEC-AF6D-7B3D21432B23}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{44A00E08-D69F-4A1E-B817-5AF67A2EE54D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44A00E08-D69F-4A1E-B817-5AF67A2EE54D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44A00E08-D69F-4A1E-B817-5AF67A2EE54D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44A00E08-D69F-4A1E-B817-5AF67A2EE54D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CF99AC2-4F02-4FEC-AF6D-7B3D21432B23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CF99AC2-4F02-4FEC-AF6D-7B3D21432B23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CF99AC2-4F02-4FEC-AF6D-7B3D21432B23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CF99AC2-4F02-4FEC-AF6D-7B3D21432B23}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A55154E8-6521-4EBD-84D3-8753383A05AD}
+	EndGlobalSection
+EndGlobal
