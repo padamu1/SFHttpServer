@@ -82,6 +82,7 @@ namespace SFHttpServer
             response.ContentLength64 = buffer.Length;
             System.IO.Stream output = response.OutputStream;
             output.Write(buffer, 0, buffer.Length);
+            await output.FlushAsync();
             output.Close();
         }
 
