@@ -10,12 +10,12 @@ namespace SFHttpServer
     public class HttpApplication : IApplication
     {
         HttpListener httpListener;
-        Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, SFHttpResponse>>> httpMethodDic;
+        Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>> httpMethodDic;
 
         public HttpApplication(SFServerInfo sfServerInfo)
         {
             httpListener = new HttpListener();
-            httpMethodDic = new Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, SFHttpResponse>>>();
+            httpMethodDic = new Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>>();
             httpListener.Prefixes.Add($"http://{sfServerInfo.Url}:{sfServerInfo.Port}/");
             httpListener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
         }
@@ -62,7 +62,7 @@ namespace SFHttpServer
 
         private async Task Process(HttpListenerContext context, HttpListenerRequest request)
         {
-            SFHttpResponse sfHttpResponse = this.RequestProcessing(request);
+            SFHttpResponse sfHttpResponse = await this.RequestProcessing(request);
 
             HttpListenerResponse response = context.Response;
 
@@ -86,7 +86,7 @@ namespace SFHttpServer
             output.Close();
         }
 
-        public Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, SFHttpResponse>>> GetMethodDic()
+        public Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>> GetMethodDic()
         {
             return httpMethodDic;
         }
@@ -97,11 +97,11 @@ namespace SFHttpServer
             Console.WriteLine("HTTP Server Stopped");
         }
 
-        public HttpApplication AddMethod(HTTP_METHOD method, string path, Func<SFHttpRequest, SFHttpResponse> func)
+        public HttpApplication AddMethod(HTTP_METHOD method, string path, Func<SFHttpRequest, Task<SFHttpResponse>> func)
         {
             if(!httpMethodDic.ContainsKey(method))
             {
-                httpMethodDic.Add(method, new Dictionary<string, Func<SFHttpRequest, SFHttpResponse>>());
+                httpMethodDic.Add(method, new Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>());
             }
 
             if (httpMethodDic[method].ContainsKey(path))

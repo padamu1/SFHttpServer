@@ -5,11 +5,11 @@ namespace SFHttpServer
 {
     public static class SFHttpRequestExtends
     {
-        public static SFHttpResponse RequestProcessing(this HttpApplication httpApplication, HttpListenerRequest request)
+        public static async Task<SFHttpResponse> RequestProcessing(this HttpApplication httpApplication, HttpListenerRequest request)
         {
             HTTP_METHOD method = HttpMethodString.GetHttpMethodEnum(request.HttpMethod);
 
-            Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, SFHttpResponse>>> httpMethodDic = httpApplication.GetMethodDic();
+            Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>> httpMethodDic = httpApplication.GetMethodDic();
 
             if (httpMethodDic.ContainsKey(method))
             {
@@ -26,7 +26,7 @@ namespace SFHttpServer
                     {
                         httpRequest.Content = reader.ReadToEnd();
                     }
-                    return httpMethodDic[method][path].Invoke(httpRequest);
+                    return await httpMethodDic[method][path].Invoke(httpRequest);
                 }
             }
             return null;
