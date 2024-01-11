@@ -7,27 +7,34 @@ namespace SFHttpServer
     {
         public static async Task<SFHttpResponse> RequestProcessing(this HttpApplication httpApplication, HttpListenerRequest request)
         {
-            HTTP_METHOD method = HttpMethodString.GetHttpMethodEnum(request.HttpMethod);
-
-            Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>> httpMethodDic = httpApplication.GetMethodDic();
-
-            if (httpMethodDic.ContainsKey(method))
+            try
             {
-                string path = new string(request.RawUrl.ToCharArray()).Remove(0, 1);
+                HTTP_METHOD method = HttpMethodString.GetHttpMethodEnum(request.HttpMethod);
 
-                if (httpMethodDic[method].ContainsKey(path))
+                Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>> httpMethodDic = httpApplication.GetMethodDic();
+
+                if (httpMethodDic.ContainsKey(method))
                 {
-                    SFHttpRequest httpRequest = new SFHttpRequest()
-                    {
-                        ContentType = request.ContentType,
-                    };
+                    string path = new string(request.RawUrl.ToCharArray()).Remove(0, 1);
 
-                    using (var reader = new StreamReader(request.InputStream))
+                    if (httpMethodDic[method].ContainsKey(path))
                     {
-                        httpRequest.Content = reader.ReadToEnd();
+                        SFHttpRequest httpRequest = new SFHttpRequest()
+                        {
+                            ContentType = request.ContentType,
+                        };
+
+                        using (var reader = new StreamReader(request.InputStream))
+                        {
+                            httpRequest.Content = reader.ReadToEnd();
+                        }
+                        return await httpMethodDic[method][path].Invoke(httpRequest);
                     }
-                    return await httpMethodDic[method][path].Invoke(httpRequest);
                 }
+            }
+            catch(Exception e)
+            {
+                Console.Error.WriteLine(e);
             }
             return null;
         }
