@@ -7,6 +7,7 @@ namespace SFHttpServer.Data
         private int statusCode;
         private string body;
         private string contentType;
+        private byte[] bytes;
 
         public SFHttpResponse() 
         { 
@@ -34,14 +35,14 @@ namespace SFHttpServer.Data
             return this.contentType;
         }
 
-        public void SetBody(string body)
+        public void SetBytes(byte[] bytes)
         {
-            this.body = body;
+            this.bytes = bytes;
         }
 
-        public string GetBody()
+        public byte[] GetBytes()
         {
-            return this.body;
+            return bytes;
         }
     }
 }

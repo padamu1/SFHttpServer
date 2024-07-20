@@ -71,7 +71,7 @@ namespace SFHttpServer
             {
                 response.StatusCode = sfHttpResponse.GetStatusCode();
                 response.ContentType = sfHttpResponse.GetContextType();
-                buffer = System.Text.Encoding.UTF8.GetBytes(sfHttpResponse.GetBody());
+                buffer = sfHttpResponse.GetBytes();
             }
             else
             {
