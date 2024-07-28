@@ -43,20 +43,28 @@ namespace SFHttpServer
 
         public void RequestReceive(IAsyncResult ar)
         {
-            HttpListener listener = (HttpListener)ar.AsyncState;
-            HttpListenerContext context = listener.EndGetContext(ar);
-            HttpListenerRequest request = context.Request;
-            Task.Run(async() =>
+            try
             {
-                try
+                HttpListener listener = (HttpListener)ar.AsyncState;
+                HttpListenerContext context = listener.EndGetContext(ar);
+                HttpListenerRequest request = context.Request;
+                Task.Run(async () =>
                 {
-                    await Process(context, request);
-                }
-                catch(Exception e)
-                {
-                    Console.Error.WriteLine(e);
-                }
-            });
+                    try
+                    {
+                        await Process(context, request);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine(e);
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine(e);
+            }
+
             ReceiveMessage();
         }
 
