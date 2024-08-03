@@ -11,6 +11,11 @@ namespace SFHttpServer
             {
                 HTTP_METHOD method = HttpMethodString.GetHttpMethodEnum(request.HttpMethod);
 
+                if(method == HTTP_METHOD.UNKNOWN)
+                {
+                    return null;
+                }
+
                 Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>> httpMethodDic = httpApplication.GetMethodDic();
 
                 if (httpMethodDic.ContainsKey(method))

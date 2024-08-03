@@ -6,6 +6,7 @@
         POST,
         PUT,
         DELETE,
+        UNKNOWN
     }
 
     public class HttpMethodString
@@ -28,7 +29,7 @@
                 case DELETE:
                     return HTTP_METHOD.DELETE;
                 default:
-                    throw new ArgumentException();
+                    return HTTP_METHOD.UNKNOWN;
             }
         }
     }

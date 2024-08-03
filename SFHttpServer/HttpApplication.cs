@@ -48,21 +48,22 @@ namespace SFHttpServer
                 HttpListener listener = (HttpListener)ar.AsyncState;
                 HttpListenerContext context = listener.EndGetContext(ar);
                 HttpListenerRequest request = context.Request;
+
                 Task.Run(async () =>
                 {
                     try
                     {
                         await Process(context, request);
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Console.Error.WriteLine(e);
+                        Console.WriteLine(ex);
                     }
                 });
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e);
+                Console.WriteLine(e);
             }
 
             ReceiveMessage();
@@ -83,7 +84,7 @@ namespace SFHttpServer
             }
             else
             {
-                buffer = System.Text.Encoding.UTF8.GetBytes("Unknown server error");
+                buffer = System.Text.Encoding.UTF8.GetBytes("Request Error");
                 response.StatusCode = 404;
             }
 
