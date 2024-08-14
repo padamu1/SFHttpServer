@@ -37,7 +37,16 @@ namespace SFHttpServer
         {
             Task.Run(() =>
             {
-                httpListener.BeginGetContext(RequestReceive, httpListener);
+                try
+                {
+                    httpListener.BeginGetContext(RequestReceive, httpListener);
+                }
+                catch (Exception e)
+                {
+                    Console.Error.Write(e);
+
+                    ReceiveMessage();
+                }
             });
         }
 
