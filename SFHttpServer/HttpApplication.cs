@@ -97,9 +97,16 @@ namespace SFHttpServer
                 response.StatusCode = 404;
             }
 
-            response.ContentLength64 = buffer.Length;
             System.IO.Stream output = response.OutputStream;
-            output.Write(buffer, 0, buffer.Length);
+            if (buffer != null)
+            {
+                response.ContentLength64 = buffer.Length;
+                output.Write(buffer, 0, buffer.Length);
+            }
+            else
+            {
+                response.ContentLength64 = 0;
+            }
             await output.FlushAsync();
             output.Close();
         }

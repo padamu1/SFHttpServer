@@ -10,8 +10,6 @@ namespace SFCSharpServerLib.Application
         {
             this.value = value;
 
-            AppDomain.CurrentDomain.ProcessExit += OnCurrentDomainExist;
-
             Initialized();
         }
 
@@ -26,16 +24,6 @@ namespace SFCSharpServerLib.Application
             {
                 await value.RunAsync();
             });
-        }
-
-        private void OnCurrentDomainExist(object sender, EventArgs e)
-        {
-            Task t1 = Task.Run(async () =>
-            {
-                await value.StopAsync();
-            });
-
-            t1.Wait();
         }
     }
 }
