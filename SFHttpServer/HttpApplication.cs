@@ -1,9 +1,7 @@
 ﻿using SFCSharpServerLib.Common.Data;
 using SFCSharpServerLib.Common.Interfaces;
 using SFHttpServer.Data;
-using System;
 using System.Net;
-using System.Text;
 
 namespace SFHttpServer
 {
@@ -11,6 +9,7 @@ namespace SFHttpServer
     {
         HttpListener httpListener;
         Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>> httpMethodDic;
+        CancellationTokenSource cancelToken;
 
         public HttpApplication(SFServerInfo sfServerInfo)
         {
@@ -30,52 +29,40 @@ namespace SFHttpServer
         {
             httpListener.Start();
 
-            ReceiveMessage();
+            cancelToken = new CancellationTokenSource();
+            Task.Run(ReceiveMessage);
         }
 
-        private void ReceiveMessage()
+        private async Task ReceiveMessage()
         {
-            Task.Run(() =>
+            var token = cancelToken.Token;
+            while (token.IsCancellationRequested)
             {
                 try
                 {
-                    httpListener.BeginGetContext(RequestReceive, httpListener);
+                    HttpListenerContext context = await httpListener.GetContextAsync();
+
+                    _ = Task.Run(() => RequestReceive(context)).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
-                    Console.Error.Write(e);
-
-                    ReceiveMessage();
+                    Console.Error.WriteLine(e);
                 }
-            });
+            }
         }
 
-        public void RequestReceive(IAsyncResult ar)
+        public async Task RequestReceive(HttpListenerContext context)
         {
             try
             {
-                HttpListener listener = (HttpListener)ar.AsyncState;
-                HttpListenerContext context = listener.EndGetContext(ar);
                 HttpListenerRequest request = context.Request;
 
-                Task.Run(async () =>
-                {
-                    try
-                    {
-                        await Process(context, request);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
-                });
+                await Process(context, request);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
             }
-
-            ReceiveMessage();
         }
 
         private async Task Process(HttpListenerContext context, HttpListenerRequest request)
@@ -118,13 +105,18 @@ namespace SFHttpServer
 
         public async Task StopAsync()
         {
+            if (cancelToken != null && cancelToken.IsCancellationRequested == false)
+            {
+                cancelToken.Cancel();
+            }
+
             httpListener.Stop();
             Console.WriteLine("HTTP Server Stopped");
         }
 
         public HttpApplication AddMethod(HTTP_METHOD method, string path, Func<SFHttpRequest, Task<SFHttpResponse>> func)
         {
-            if(!httpMethodDic.ContainsKey(method))
+            if (!httpMethodDic.ContainsKey(method))
             {
                 httpMethodDic.Add(method, new Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>());
             }
