@@ -36,7 +36,7 @@ namespace SFHttpServer
         private async Task ReceiveMessage()
         {
             var token = cancelToken.Token;
-            while (token.IsCancellationRequested)
+            while (!token.IsCancellationRequested)
             {
                 try
                 {
