@@ -5,10 +5,10 @@ namespace SFHttpServer.Core
 {
     public static class SFHttpResponseParser
     {
-        public static byte[] Parse(SFHttpRequestInfo requestInfo, SFHttpResponse sfHttpResponse)
+        public static byte[] Parse(SFHttpResponse sfHttpResponse)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append(requestInfo.Version);
+            sb.Append("HTTP/*");
             sb.Append(' ');
             sb.Append(sfHttpResponse.GetStatusCode());
             sb.Append(' ');

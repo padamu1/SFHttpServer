@@ -86,7 +86,7 @@ namespace SFHttpServer
                 sfHttpResponse.SetStatus(404);
             }
 
-            socket.Send(SFHttpResponseParser.Parse(sfHttpRequestInfo, sfHttpResponse));
+            socket.Send(SFHttpResponseParser.Parse(sfHttpResponse));
 
             if (sfHttpResponse.GetContentLength() > 0)
             {
