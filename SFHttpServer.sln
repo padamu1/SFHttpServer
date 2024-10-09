@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFHttpServer", "SFHttpServe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFCSharpServerLib", "SFCSharpServerLib\SFCSharpServerLib.csproj", "{5CF99AC2-4F02-4FEC-AF6D-7B3D21432B23}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFTcpServer", "SFTcpServer\SFTcpServer.csproj", "{580C221D-E304-4821-AE26-E0D5619E30F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{5CF99AC2-4F02-4FEC-AF6D-7B3D21432B23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CF99AC2-4F02-4FEC-AF6D-7B3D21432B23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CF99AC2-4F02-4FEC-AF6D-7B3D21432B23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{580C221D-E304-4821-AE26-E0D5619E30F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{580C221D-E304-4821-AE26-E0D5619E30F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{580C221D-E304-4821-AE26-E0D5619E30F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{580C221D-E304-4821-AE26-E0D5619E30F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,23 +1,25 @@
 ﻿using SFCSharpServerLib.Common.Data;
 using SFCSharpServerLib.Common.Interfaces;
+using SFHttpServer.Core;
 using SFHttpServer.Data;
 using System.Net;
+using System.Net.Sockets;
+using System.Text;
 
 namespace SFHttpServer
 {
     public class HttpApplication : IApplication
     {
-        HttpListener httpListener;
+        SFHttpListener httpListener;
         Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>> httpMethodDic;
         CancellationTokenSource cancelToken;
 
         public HttpApplication(SFServerInfo sfServerInfo)
         {
-            httpListener = new HttpListener();
             httpMethodDic = new Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>>();
-            httpListener.Prefixes.Add($"http://{sfServerInfo.Url}:{sfServerInfo.Port}/");
-            httpListener.AuthenticationSchemes = AuthenticationSchemes.Anonymous;
+            httpListener = SFHttpListener.SetServer(IPAddress.Any, sfServerInfo.Port, OnSocketAccept);
         }
+
         public async Task RunAsync()
         {
             Console.WriteLine("HTTP Server Run");
@@ -27,75 +29,70 @@ namespace SFHttpServer
 
         public void Publish()
         {
-            httpListener.Start();
-
-            cancelToken = new CancellationTokenSource();
-            Task.Run(ReceiveMessage);
+            httpListener.StartServer();
         }
 
-        private async Task ReceiveMessage()
+        private async Task OnSocketAccept(Socket socket)
         {
-            var token = cancelToken.Token;
-            while (!token.IsCancellationRequested)
-            {
-                try
-                {
-                    HttpListenerContext context = await httpListener.GetContextAsync();
-
-                    _ = Task.Run(() => RequestReceive(context)).ConfigureAwait(false);
-                }
-                catch (Exception e)
-                {
-                    Console.Error.WriteLine(e);
-                }
-            }
-        }
-
-        public async Task RequestReceive(HttpListenerContext context)
-        {
+            byte[] bytes = new byte[1024];
+            string data = null;
             try
             {
-                HttpListenerRequest request = context.Request;
+                int numByte = await socket.ReceiveAsync(bytes, SocketFlags.None);
+                data += Encoding.ASCII.GetString(bytes, 0, numByte);
+                while (socket.Available > 0)
+                {
+                    numByte = socket.Receive(bytes);
+                    data += Encoding.ASCII.GetString(bytes, 0, numByte);
+                    if (numByte <= 0)
+                    {
+                        break;
+                    }
+                }
 
-                await Process(context, request);
+                await Process(socket, data);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                Console.Error.WriteLine(e);
+                socket.Close();
             }
         }
 
-        private async Task Process(HttpListenerContext context, HttpListenerRequest request)
+        private async Task Process(Socket socket, string data)
         {
-            SFHttpResponse sfHttpResponse = await this.RequestProcessing(request);
-
-            HttpListenerResponse response = context.Response;
-
-            byte[] buffer;
-            if (sfHttpResponse != null)
+            SFHttpRequestInfo? sfHttpRequestInfo;
+            try
             {
-                response.StatusCode = sfHttpResponse.GetStatusCode();
-                response.ContentType = sfHttpResponse.GetContextType();
-                buffer = sfHttpResponse.GetBytes();
+                sfHttpRequestInfo = SFHttpRequestParser.Parse(data);
             }
-            else
+            catch(Exception e)
             {
-                buffer = System.Text.Encoding.UTF8.GetBytes("Request Error");
-                response.StatusCode = 404;
+                sfHttpRequestInfo = null;
             }
 
-            System.IO.Stream output = response.OutputStream;
-            if (buffer != null)
+            SFHttpResponse sfHttpResponse = null;
+            if (sfHttpRequestInfo != null)
             {
-                response.ContentLength64 = buffer.Length;
-                output.Write(buffer, 0, buffer.Length);
+                sfHttpResponse = await this.RequestProcessing(sfHttpRequestInfo);
             }
-            else
+
+            if (sfHttpResponse == null)
             {
-                response.ContentLength64 = 0;
+                sfHttpResponse = new SFHttpResponse();
+                sfHttpResponse.SetContentType("text/plain");
+                sfHttpResponse.SetBytes(System.Text.Encoding.UTF8.GetBytes("Request Error"));
+                sfHttpResponse.SetStatus(404);
             }
-            await output.FlushAsync();
-            output.Close();
+
+            socket.Send(SFHttpResponseParser.Parse(sfHttpRequestInfo, sfHttpResponse));
+
+            if (sfHttpResponse.GetContentLength() > 0)
+            {
+                socket.Send(sfHttpResponse.GetBytes());
+            }
+
+            socket.Close();
         }
 
         public Dictionary<HTTP_METHOD, Dictionary<string, Func<SFHttpRequest, Task<SFHttpResponse>>>> GetMethodDic()
@@ -110,7 +107,7 @@ namespace SFHttpServer
                 cancelToken.Cancel();
             }
 
-            httpListener.Stop();
+            httpListener.StopServer();
             Console.WriteLine("HTTP Server Stopped");
         }
 

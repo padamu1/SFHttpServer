@@ -44,5 +44,10 @@ namespace SFHttpServer.Data
         {
             return bytes;
         }
+
+        public int GetContentLength()
+        {
+            return (int)bytes.Length;
+        }
     }
 }

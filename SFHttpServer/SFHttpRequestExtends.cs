@@ -1,17 +1,17 @@
-﻿using SFHttpServer.Data;
-using System.Net;
+﻿using SFHttpServer.Core;
+using SFHttpServer.Data;
 
 namespace SFHttpServer
 {
     public static class SFHttpRequestExtends
     {
-        public static async Task<SFHttpResponse> RequestProcessing(this HttpApplication httpApplication, HttpListenerRequest request)
+        public static async Task<SFHttpResponse> RequestProcessing(this HttpApplication httpApplication, SFHttpRequestInfo request)
         {
             try
             {
-                HTTP_METHOD method = HttpMethodString.GetHttpMethodEnum(request.HttpMethod);
+                HTTP_METHOD method = HttpMethodString.GetHttpMethodEnum(request.Method);
 
-                if(method == HTTP_METHOD.UNKNOWN)
+                if (method == HTTP_METHOD.UNKNOWN)
                 {
                     return null;
                 }
@@ -20,7 +20,7 @@ namespace SFHttpServer
 
                 if (httpMethodDic.ContainsKey(method))
                 {
-                    string path = new string(request.RawUrl.ToCharArray()).Remove(0, 1);
+                    string path = new string(request.Path.ToCharArray()).Remove(0, 1);
 
                     if (httpMethodDic[method].ContainsKey(path))
                     {
@@ -29,15 +29,12 @@ namespace SFHttpServer
                             ContentType = request.ContentType,
                         };
 
-                        using (var reader = new StreamReader(request.InputStream))
-                        {
-                            httpRequest.Content = reader.ReadToEnd();
-                        }
+                        httpRequest.Content = request.Content;
                         return await httpMethodDic[method][path].Invoke(httpRequest);
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.Error.WriteLine(e);
             }
