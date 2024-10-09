@@ -50,6 +50,7 @@ namespace SFHttpServer
                     }
                 }
 
+                Console.Write(data);
                 await Process(socket, data);
             }
             catch (Exception e)

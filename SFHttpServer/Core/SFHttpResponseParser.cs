@@ -30,7 +30,6 @@ namespace SFHttpServer.Core
             sb.Append(sfHttpResponse.GetContentLength());
             sb.Append("\r\n\r\n");
 
-            Console.WriteLine(sb.ToString());
             return System.Text.Encoding.UTF8.GetBytes(sb.ToString());
         }
     }
