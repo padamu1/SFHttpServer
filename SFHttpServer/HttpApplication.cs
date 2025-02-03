@@ -93,6 +93,7 @@ namespace SFHttpServer
                 socket.Send(sfHttpResponse.GetBytes());
             }
 
+            socket.Shutdown(SocketShutdown.Both);
             socket.Close();
         }
 
