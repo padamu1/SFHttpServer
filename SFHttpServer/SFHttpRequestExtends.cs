@@ -30,6 +30,7 @@ namespace SFHttpServer
                         };
 
                         httpRequest.Content = request.Content;
+                        httpRequest.Path = request.Path;
                         return await httpMethodDic[method][path].Invoke(httpRequest);
                     }
                 }
